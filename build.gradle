@@ -1,0 +1,26 @@
+plugins {
+    id "java"
+}
+
+group = "pdfviewer"
+version = "1.0.0"
+
+repositories { mavenCentral() }
+
+dependencies {
+    compileOnly "net.portswigger.burp.extensions:montoya-api:2026.7"
+    implementation("org.apache.pdfbox:pdfbox-app:3.0.8") { transitive = false }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 17
+}
+
+jar {
+    archiveFileName = "burp-pdf-viewer.jar"
+    destinationDirectory = file("dist")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { zipTree(it) } }
+    exclude "META-INF/MANIFEST.MF", "META-INF/*.SF", "META-INF/*.RSA", "META-INF/*.DSA", "module-info.class"
+}
