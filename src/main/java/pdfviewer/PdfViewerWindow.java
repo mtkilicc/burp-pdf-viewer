@@ -4,7 +4,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -16,6 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-final class PdfViewerWindow extends JFrame {
+final class PdfViewerWindow extends JDialog {
     private byte[] pdfBytes;
     private PdfDocument document;
     private final int pageCount;
@@ -40,8 +41,8 @@ final class PdfViewerWindow extends JFrame {
     private boolean rendering;
     private boolean disposed;
 
-    PdfViewerWindow(PdfDocument document, byte[] bytes, String source) {
-        super("PDF Viewer — " + source);
+    PdfViewerWindow(Frame owner, PdfDocument document, byte[] bytes, String source) {
+        super(owner, "PDF Viewer — " + source, false);
         this.pdfBytes = bytes;
         this.document = document;
         this.pageCount = document.pageCount();
@@ -69,7 +70,7 @@ final class PdfViewerWindow extends JFrame {
         save.addActionListener(e -> savePdf());
 
         setSize(980, 820);
-        setLocationByPlatform(true);
+        setLocationRelativeTo(owner);
     }
 
     void showPage(int requestedPage) {

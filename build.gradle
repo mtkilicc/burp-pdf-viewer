@@ -24,3 +24,25 @@ jar {
     from { configurations.runtimeClasspath.collect { zipTree(it) } }
     exclude "META-INF/MANIFEST.MF", "META-INF/*.SF", "META-INF/*.RSA", "META-INF/*.DSA", "module-info.class"
 }
+
+// The same executable test classes are used by build.sh and Gradle.
+test {
+    enabled = false
+}
+
+def pdfChecks = tasks.register("pdfChecks") {
+    group = "verification"
+}
+
+["PdfDataDecoderTest", "PdfRenderingTest"].each { testClass ->
+    def runTest = tasks.register("run${testClass}", JavaExec) {
+        dependsOn tasks.named("testClasses"), tasks.named("jar")
+        classpath = files(tasks.named("jar").flatMap { it.archiveFile }, sourceSets.test.output)
+        mainClass = "pdfviewer.${testClass}"
+        enableAssertions = true
+        systemProperty "java.awt.headless", "true"
+    }
+    pdfChecks.configure { dependsOn runTest }
+}
+
+check { dependsOn pdfChecks }

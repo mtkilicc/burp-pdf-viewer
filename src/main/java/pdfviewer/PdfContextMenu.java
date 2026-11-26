@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -25,9 +26,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 final class PdfContextMenu implements ContextMenuItemsProvider {
+    private final Frame owner;
     private final Set<PdfViewerWindow> windows = new HashSet<>();
     private boolean opening;
     private volatile boolean unloaded;
+
+    PdfContextMenu(Frame owner) {
+        this.owner = owner;
+    }
 
     @Override
     public List<Component> provideMenuItems(ContextMenuEvent event) {
@@ -96,7 +102,7 @@ final class PdfContextMenu implements ContextMenuItemsProvider {
                         PdfViewerWindow.closeDocument(opened.document());
                         return;
                     }
-                    window = new PdfViewerWindow(opened.document(), opened.bytes(), opened.source());
+                    window = new PdfViewerWindow(owner, opened.document(), opened.bytes(), opened.source());
                     window.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent event) {
@@ -160,8 +166,8 @@ final class PdfContextMenu implements ContextMenuItemsProvider {
         return "Could not read the PDF. The document may be incomplete, empty, or damaged.";
     }
 
-    private static void showError(String message) {
-        JOptionPane.showMessageDialog(null, message, "Could not open PDF", JOptionPane.ERROR_MESSAGE);
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(owner, message, "Could not open PDF", JOptionPane.ERROR_MESSAGE);
     }
 
     private record OpenedPdf(PdfDocument document, byte[] bytes, String source) {}

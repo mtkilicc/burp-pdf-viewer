@@ -19,7 +19,13 @@ In Burp Suite, open **Extensions > Installed > Add**, choose **Java**, and selec
 
 ## Build
 
-Run the build script from the repository root with Java 17 or later.
+Build and run the tests from the repository root with Java 17 or later.
+
+```sh
+./gradlew build
+```
+
+The build writes a self-contained JAR to `dist/burp-pdf-viewer.jar`. The shell build script is also available.
 
 ```sh
 ./build.sh
